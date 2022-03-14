@@ -13,6 +13,8 @@ class Gestor:
         data = self.rutaArchivo()
         archivo = open(data, 'r', encoding = "utf-8")
         texto = archivo.read()
+        #SIMBOLO TERMINAL
+        texto+='\n$'
         archivo.close()
         return texto
 

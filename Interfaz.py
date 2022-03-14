@@ -1,10 +1,11 @@
 from tkinter import *
-
 from Gestor import Gestor
+from Analizador import Analizador
 
+gestor = Gestor()
+analizar = Analizador()
 
 class Interfaz:
-
     def __init__(self):
         raiz = Tk()
         raiz.title("Analizador, Proyecto1 LFP")
@@ -42,8 +43,12 @@ class Interfaz:
     def Analizar(self):
         texto = self.analizar.get(1.0, "end-1c")  #->PARA PODER SACAR LA INFORMACION DEL CAMPO
         #texto = self.analizar.insert(1.0, "HOLAAAAAAAAAAA\n")  #->PARA PODER METER EL TEXTO EN EL CAMPO
-        print(texto)
+        #analizar.analizar(texto)
+        #analizar.imprimirTokens()
+        #analizar.imprimirErrores()
+        analizar.analizar2(texto)
+        analizar.imprimirT()
+        analizar.imprimirE()
 
     def CargarArchivo(self):
-        gestor = Gestor()
         self.analizar.insert(1.0,gestor.CargarData())

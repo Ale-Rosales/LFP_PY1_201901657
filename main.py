@@ -1,5 +1,3 @@
-from tkinter import *
-
 from Interfaz import Interfaz
 
 
