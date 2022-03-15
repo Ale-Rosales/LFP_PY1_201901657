@@ -12,11 +12,12 @@ LFP Primer Semestre 2022, Proyecto 1
 | Corchete Izquierdo | Un caracter '[' | '[' | [ |
 | Signo menor que | Un caracter '<' | '<' | < |
 | Dos puntos | Un caracter ':' | ':' | :
-| Comilla doble | ¿Dos caracteres? ' " " ' | ' " " ' | " " |
+| Comilla doble | Un caracter ' " ' | ' " ' | " |
 | Coma | Un caracter ',' | ',' | , |
 | Signo mayor que | Un caracter '>' | '>' | > |
-| Comilla simple | ¿Dos caracteres? ' ' | ' ' | ' ' |
+| Comilla simple | Un caracter " ' " | " ' " | ' |
 | Corchete derecho | Un caracter ']' | ']' | ] |
 | Signo menos | Un caracter '-' | '-' | - |
+| Parametros del HTML |  Palabra | [A-Za-z] | etiqueta, texto, Nombre:, sexo, Ingrese nombre |
 
 

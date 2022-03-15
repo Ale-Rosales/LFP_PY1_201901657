@@ -257,7 +257,7 @@ class Analizador:
             x.add_row([error_.fila, error_.columna, error_.descripcion])
         print(x)
     
-    #OTRA PRUEBA PARA ANALIZAR
+    #---------------------OTRA PRUEBA DE ANALIZAR---------------------
     def S0(self, caracter : str):
         "Estado Q0"
         if caracter.isalpha():
@@ -328,12 +328,16 @@ class Analizador:
             self.buffer += caracter
             self.columna += 1
         else:
-            if self.buffer in ['formulario', 'tipo', 'valor', 'fondo', 'valores', 'evento']:
-                self.agregarToken(self.buffer, self.linea, self.columna, 'Reservada/Identificador '+self.buffer)
+            if self.buffer in ['formulario', ]:
+                self.agregarToken(self.buffer, self.linea, self.columna, 'Reservada_'+self.buffer)
+                self.estado = 0
+                self.i -= 1
+            elif self.buffer in ['tipo', 'valor', 'fondo', 'valores', 'evento']:
+                self.agregarToken(self.buffer, self.linea, self.columna, 'Identificador_'+self.buffer)
                 self.estado = 0
                 self.i -= 1
             else:
-                self.agregarToken(self.buffer, self.linea, self.columna, 'Para el HTML')
+                self.agregarToken(self.buffer, self.linea, self.columna, 'Para HTML')
                 self.estado = 0
                 self.i -= 1
 

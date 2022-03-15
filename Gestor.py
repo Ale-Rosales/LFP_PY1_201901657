@@ -1,4 +1,6 @@
+from http.client import ImproperConnectionState
 import easygui
+from Analizador import Analizador
 
 class Gestor:
 
@@ -17,5 +19,7 @@ class Gestor:
         texto+='\n$'
         archivo.close()
         return texto
+
+
 
         
