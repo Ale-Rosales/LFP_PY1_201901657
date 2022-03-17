@@ -1,5 +1,6 @@
 from lib2to3.pgen2 import token
 from tkinter import *
+from tkinter import messagebox as MessageBox
 
 from matplotlib.pyplot import text
 from Gestor import Gestor
@@ -56,7 +57,7 @@ class Interfaz:
         botonErrores.place(x=280, y=10)
         manuales = Label(miFrame, text="Manuales", font=("Comic Sans MS", 15))
         manuales.place(x=470,y=20)
-        botonUsuario = Button(miFrame, text="Manual\nUsuario", font=("Comic Sans MS", 10),width=12, height=2, command=self.Prueba)
+        botonUsuario = Button(miFrame, text="Manual\nUsuario", font=("Comic Sans MS", 10),width=12, height=2)
         botonUsuario.place(x=580, y=10)
         botonTecnico = Button(miFrame, text="Manual\nTecnico", font=("Comic Sans MS", 10),width=12, height=2)
         botonTecnico.place(x=700, y=10)
@@ -66,16 +67,20 @@ class Interfaz:
     #----------------------------FUNCIONES DE BOTONES (CARGAR Y ANALIZAR)----------------------------
 
     def Analizar(self):
+
         texto = self.analizar.get(1.0, "end-1c")  #->PARA PODER SACAR LA INFORMACION DEL CAMPO
         #texto = self.analizar.insert(1.0, "HOLAAAAAAAAAAA\n")  #->PARA PODER METER EL TEXTO EN EL CAMPO
         #analizar.analizar(texto)
         #analizar.imprimirTokens()
         #analizar.imprimirErrores()
-        analizar.analizar2(texto)
-        analizar.imprimirT()
-        analizar.imprimirE()
-        self.Todos()
-        self.Formulario(texto)
+        if len(texto) == 0:
+            MessageBox.showwarning("Alerta", "No hay texto para analizar")
+        else:
+            analizar.analizar2(texto)
+            analizar.imprimirT()
+            analizar.imprimirE()
+            self.Data()
+            self.Formulario(texto)
 
     def CargarArchivo(self):
         self.analizar.insert(1.0,gestor.CargarData())
@@ -86,7 +91,7 @@ class Interfaz:
         if token.tipo == "Para HTML":
             return token.lexema
     
-    def Todos(self):
+    def Data(self):
         self.DataEvento()
         #self.DataFondo()
         self.DataTipo()
@@ -154,8 +159,13 @@ class Interfaz:
                 if tokens[i+2].tipo == "Comilla doble" and tokens[i+4].tipo == "Comilla doble":
                     texto = tokens[i+3].lexema
                     self.evento.append(texto)
-                
-                #print(texto)
+
+    def ValorData(self):
+        """tokens = analizar.Tokens
+        for i in range(0,len(tokens)):
+            if tokens[i].tipo == "Menor que":
+                if tokens[i+2]"""
+        pass
     
     #----------------------------FORMULARIO----------------------------
 
@@ -309,129 +319,142 @@ class Interfaz:
 
     def ReporteTokens(self):
         tokens = analizar.Tokens
-        textoTabla = ""
-        txtFinal = ('</div>'
-        '</body>'
-        '</html>')
+        if len(tokens) == 0:
+            MessageBox.showwarning("Alerta", "Sin contenido para reporte")
+        else:
+            textoTabla = ""
+            txtFinal = ('</div>'
+            '</body>'
+            '</html>')
 
-        i = 0
+            i = 0
 
-        for x in tokens:
-            i += 1
-            textoTabla = textoTabla+'<tr>'+'<td>'+str(x.lexema)+'</td>'+'<td>'+str(x.linea)+'</td>'+'<td>'+str(x.columna)+'</td>'+'<td>'+str(x.tipo)+'</td>'+'</tr>'
+            for x in tokens:
+                i += 1
+                textoTabla = textoTabla+'<tr>'+'<td>'+str(x.lexema)+'</td>'+'<td>'+str(x.linea)+'</td>'+'<td>'+str(x.columna)+'</td>'+'<td>'+str(x.tipo)+'</td>'+'</tr>'
 
-        contenidoHTML = (
-        '<!DOCTYPE html>'
-        '<html>' 
-        '<head> '
-        '<meta charset="utf-8"> '
-        '<title>Reporte Tokens</title>'
-        '<link href="assets/css/bootstrap-responsive.css" type="text/css" rel="stylesheet">'
-        '<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" rel="stylesheet">'
-        '<link rel="stylesheet" type="text/css"  href="Style.css">'
-        '<link rel="stylesheet" type="text/css" href="bootstrap.css">'
-        '</head>'
-        '<body>'
-        '<div class="container-fluid welcome-page" id="home">'
-        '<div class="jumbotron">'
-        '<h1>'
-        '<span>Reporte Tokens</span>'
-        '</h1>'
-        '</div>'
-        '</div>')
-        
-        file = open("./REPORTES/ReporteTokens.html","w")
-        file.write(str(contenidoHTML))
-        file.write('<h2>'
-        '<span>Analisis Realizado</span>'
-        '</h2>')
+            contenidoHTML = (
+            '<!DOCTYPE html>'
+            '<html>' 
+            '<head> '
+            '<meta charset="utf-8"> '
+            '<title>Reporte Tokens</title>'
+            '<link href="assets/css/bootstrap-responsive.css" type="text/css" rel="stylesheet">'
+            '<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" rel="stylesheet">'
+            '<link rel="stylesheet" type="text/css"  href="Style.css">'
+            '<link rel="stylesheet" type="text/css" href="bootstrap.css">'
+            '</head>'
+            '<body>'
+            '<div class="container-fluid welcome-page" id="home">'
+            '<div class="jumbotron">'
+            '<h1>'
+            '<span>Reporte Tokens</span>'
+            '</h1>'
+            '</div>'
+            '</div>')
+            
+            file = open("./REPORTES/ReporteTokens.html","w")
+            file.write(str(contenidoHTML))
+            file.write('<h2>'
+            '<span>Analisis Realizado</span>'
+            '</h2>')
 
-        txtHtml=(
-        '<table class="table table-responsive">'
-        '<thead>'
-        '<tr>'
-        '<th scope="col">Lexema</th>'
-        '<th scope="col">Linea</th>'
-        '<th scope="col">Columna</th>'
-        '<th scope="col">Tipo</th>'
-        '</tr>'
-        '</thead>'
-        '<tbody>')
+            txtHtml=(
+            '<table class="table table-responsive">'
+            '<thead>'
+            '<tr>'
+            '<th scope="col">Lexema</th>'
+            '<th scope="col">Linea</th>'
+            '<th scope="col">Columna</th>'
+            '<th scope="col">Tipo</th>'
+            '</tr>'
+            '</thead>'
+            '<tbody>')
 
-        for x in tokens:
-            i += 1
-            txtHtml = txtHtml+'<tr>'+'<td>'+str(x.lexema)+'</td>'+'<td>'+str(x.linea)+'</td>'+'<td>'+str(x.columna)+'</td>'+'<td>'+str(x.tipo)+'</td>'+'</tr>'
+            for x in tokens:
+                i += 1
+                txtHtml = txtHtml+'<tr>'+'<td>'+str(x.lexema)+'</td>'+'<td>'+str(x.linea)+'</td>'+'<td>'+str(x.columna)+'</td>'+'<td>'+str(x.tipo)+'</td>'+'</tr>'
 
-        file.write(txtHtml)
-        file.write('</tbody>'
-        '</table>'
-        '</div>'
-        '</div>')
+            file.write(txtHtml)
+            file.write('</tbody>'
+            '</table>'
+            '</div>'
+            '</div>')
 
-        file.write(txtFinal)
-        file.close()
-        webbrowser.open("file:///"+os.getcwd()+"/REPORTES/ReporteTokens.html")
+            file.write(txtFinal)
+            file.close()
+            webbrowser.open("file:///"+os.getcwd()+"/REPORTES/ReporteTokens.html")
     
     def ReporteErrores(self):
         errores = analizar.Errores
-        textoTabla = ""
-        txtFinal = ('</div>'
-        '</body>'
-        '</html>')
+        if len(errores) == 0:
+            MessageBox.showwarning("Alerta", "Sin contenido para reportes")
+        else:
+            textoTabla = ""
+            txtFinal = ('</div>'
+            '</body>'
+            '</html>')
 
-        i = 0
+            i = 0
 
-        for x in errores:
-            i += 1
-            textoTabla = textoTabla+'<tr>'+'<td>'+str(x.descripcion)+'</td>'+'<td>'+str(x.linea)+'</td>'+'<td>'+str(x.columna)+'</td>'+'</tr>'
+            for x in errores:
+                i += 1
+                textoTabla = textoTabla+'<tr>'+'<td>'+str(x.descripcion)+'</td>'+'<td>'+str(x.linea)+'</td>'+'<td>'+str(x.columna)+'</td>'+'</tr>'
 
-        contenidoHTML = (
-        '<!DOCTYPE html>'
-        '<html>' 
-        '<head> '
-        '<meta charset="utf-8"> '
-        '<title>Reporte Tokens</title>'
-        '<link href="assets/css/bootstrap-responsive.css" type="text/css" rel="stylesheet">'
-        '<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" rel="stylesheet">'
-        '<link rel="stylesheet" type="text/css"  href="Style.css">'
-        '<link rel="stylesheet" type="text/css" href="bootstrap.css">'
-        '</head>'
-        '<body>'
-        '<div class="container-fluid welcome-page" id="home">'
-        '<div class="jumbotron">'
-        '<h1>'
-        '<span>Reporte Errores</span>'
-        '</h1>'
-        '</div>'
-        '</div>')
-        
-        file = open("./REPORTES/ReporteErrores.html","w")
-        file.write(str(contenidoHTML))
-        file.write('<h2>'
-        '<span>Analisis Realizado</span>'
-        '</h2>')
+            contenidoHTML = (
+            '<!DOCTYPE html>'
+            '<html>' 
+            '<head> '
+            '<meta charset="utf-8"> '
+            '<title>Reporte Tokens</title>'
+            '<link href="assets/css/bootstrap-responsive.css" type="text/css" rel="stylesheet">'
+            '<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" rel="stylesheet">'
+            '<link rel="stylesheet" type="text/css"  href="Style.css">'
+            '<link rel="stylesheet" type="text/css" href="bootstrap.css">'
+            '</head>'
+            '<body>'
+            '<div class="container-fluid welcome-page" id="home">'
+            '<div class="jumbotron">'
+            '<h1>'
+            '<span>Reporte Errores</span>'
+            '</h1>'
+            '</div>'
+            '</div>')
+            
+            file = open("./REPORTES/ReporteErrores.html","w")
+            file.write(str(contenidoHTML))
+            file.write('<h2>'
+            '<span>Analisis Realizado</span>'
+            '</h2>')
 
-        txtHtml=(
-        '<table class="table table-responsive">'
-        '<thead>'
-        '<tr>'
-        '<th scope="col">Descripcion</th>'
-        '<th scope="col">Linea</th>'
-        '<th scope="col">Columna</th>'
-        '</tr>'
-        '</thead>'
-        '<tbody>')
+            txtHtml=(
+            '<table class="table table-responsive">'
+            '<thead>'
+            '<tr>'
+            '<th scope="col">Descripcion</th>'
+            '<th scope="col">Linea</th>'
+            '<th scope="col">Columna</th>'
+            '</tr>'
+            '</thead>'
+            '<tbody>')
 
-        for x in errores:
-            i += 1
-            txtHtml = txtHtml+'<tr>'+'<td>'+str(x.descripcion)+'</td>'+'<td>'+str(x.linea)+'</td>'+'<td>'+str(x.columna)+'</td>'+'</tr>'
+            for x in errores:
+                i += 1
+                txtHtml = txtHtml+'<tr>'+'<td>'+str(x.descripcion)+'</td>'+'<td>'+str(x.linea)+'</td>'+'<td>'+str(x.columna)+'</td>'+'</tr>'
 
-        file.write(txtHtml)
-        file.write('</tbody>'
-        '</table>'
-        '</div>'
-        '</div>')
+            file.write(txtHtml)
+            file.write('</tbody>'
+            '</table>'
+            '</div>'
+            '</div>')
 
-        file.write(txtFinal)
-        file.close()
-        webbrowser.open("file:///"+os.getcwd()+"/REPORTES/ReporteErrores.html")
+            file.write(txtFinal)
+            file.close()
+            webbrowser.open("file:///"+os.getcwd()+"/REPORTES/ReporteErrores.html")
+
+    #----------------------------DOCUMENTACION----------------------------
+    #def Usuario(self):
+        #webbrowser.open("file:///"+os.getcwd()+"/DOCUMENTACION/ManualUsuario.pdf")
+
+    #def Tecnico(self):
+        #webbrowser.open("file:///"+os.getcwd()+"/DOCUMENTACION/ManualTecnico.pdf")
