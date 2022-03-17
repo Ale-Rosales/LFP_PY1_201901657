@@ -30,6 +30,9 @@ class Analizador:
     def agregarError(self,caracter, linea, columna):
         self.Errores.append(Error('Caracter ' + caracter + ' no reconocido.', linea, columna))
 
+    
+    #----------------------------PRUEBA DE ANALIZAR (NO LEE BIEN)----------------------------
+    
     def isLetter(self,caracter):
         if(ord(caracter) >= 65 and ord(caracter) <= 90
         or (ord(caracter)) >= 97 and ord(caracter) <= 122
@@ -52,7 +55,6 @@ class Analizador:
         elif ord(caracter) == 34:
             return False
 
-    #---------------------PRUEBA DE USO---------------------
     def analizar(self, texto):
         self.listaTokens=[]
         self.listaErrores=[]
@@ -97,20 +99,18 @@ class Analizador:
                 elif self.isNum(x) == True:
                     lexema+=x
                     columna+=1
-                    estado = 9 #VERIFICAR COMO IRIAN LOS ESTADOS
+                    estado = 9
                 elif self.isLetter(x) == True:
                     lexema+=x
                     columna+=1
-                    estado = 11 #VERIFICAR COMO IRIAN LOS ESTADOS
+                    estado = 11
                 elif x == '$':
                     self.listaTokens.append(Tokens('$',"Fin Cadena",fila,columna))
                     print("Fin del analisis")
                 else:
                     e = "Error lexico en fila "+str(fila)+" y columna "+str(columna)
                     self.listaErrores.append(Errores(fila,columna,e, "Simbolo, letra o digito"))
-        
-            #TERMINA LO FEO
-            #EMPIEZA LO MAS FEO
+ 
             elif estado == 1:
                 if x == '\n':
                     fila += 1
@@ -257,7 +257,7 @@ class Analizador:
             x.add_row([error_.fila, error_.columna, error_.descripcion])
         print(x)
     
-    #---------------------OTRA PRUEBA DE ANALIZAR---------------------
+    #---------------------OTRA PRUEBA DE ANALIZAR (ESTA PARECE LEER BIEN)---------------------
     def S0(self, caracter : str):
         "Estado Q0"
         if caracter.isalpha():
@@ -337,7 +337,7 @@ class Analizador:
                 self.estado = 0
                 self.i -= 1
             else:
-                self.agregarToken(self.buffer, self.linea, self.columna, 'Para HTML')
+                self.agregarToken(self.buffer, self.linea, self.columna, 'Contenido_HTML')
                 self.estado = 0
                 self.i -= 1
 
