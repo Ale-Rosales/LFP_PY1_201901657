@@ -1,0 +1,117 @@
+ def ValorData(self):
+        tokens = analizar.Tokens
+        i = 0
+        #texto = ""
+        while tokens[i].tipo != "Corchete izquierdo":
+            i+=1
+        while tokens[i].tipo != "Corchete derecho":
+            i+=1
+            while tokens[i].tipo != "Menor que":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Coma":
+                i+=1
+            i+=1
+            texto  = ""
+            while tokens[i].tipo != "Mayor que":
+                texto = texto + tokens[i].lexema
+                #print(texto)
+                i+=1
+            i+=1
+            print(texto)
+
+
+#----------------------SALIDA----------------------#
+valor:"Nombre:"
+valor:"Nombre",fondo:"Ingresenombre"
+valor:"sexo",valores:['Masculino','Femenino']
+valor:"pais",valores:['Guatemala','ElSalvador','Honduras']
+valor:"Valor",evento:"info"
+
+
+
+def ValorData(self):
+        tokens = analizar.Tokens
+        i = 0
+        while tokens[i].tipo != "Corchete izquierdo":
+            i+=1
+            texto = ""
+        while tokens[i].tipo != "Corchete derecho":
+            i+=1
+            while tokens[i].tipo != "Menor que":
+                i+=1
+            i+=1
+            texto = ""
+            while tokens[i].tipo != "Mayor que":
+                texto = texto + tokens[i].lexema
+                i+=1
+            i+=1
+            print(texto)
+
+
+#----------------------SALIDA----------------------#
+tipo:"etiqueta",valor:"Nombre:"
+tipo:"texto",valor:"Nombre",fondo:"Ingresenombre"
+tipo:"grupo-radio",valor:"sexo",valores:['Masculino','Femenino']
+tipo:"grupo-option",valor:"pais",valores:['Guatemala','ElSalvador','Honduras']
+tipo:"boton",valor:"Valor",evento:"info"
+
+
+def ValorData(self):
+        tokens = analizar.Tokens
+        i = 0
+        while tokens[i].tipo != "Corchete izquierdo":
+            i+=1
+        while tokens[i].tipo != "Corchete derecho":
+            i+=1
+            while tokens[i].tipo != "Menor que":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Identificador_tipo":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Dos puntos":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Comilla doble":
+                i+=1
+            i+=1
+            tipo = ""
+            valores = ""
+            evento = ""
+            fondo = ""
+            while tokens[i].tipo != "Comilla doble":
+                tipo = tipo + tokens[i].lexema
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Coma":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Identificador_valor":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Dos puntos":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Comilla doble":
+                i+=1
+            i+=1
+            valor = ""
+            while tokens[i].tipo != "Comilla doble":
+                valor = valor + tokens[i].lexema
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Mayor que":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Coma":
+                if tokens[i].tipo == "Corchete derecho":
+                    self.agregarContenido(tipo, valor, fondo, valores, evento)
+                    break
+                else:
+                    i+=1
+            if tokens[i].tipo == "Coma":
+                self.agregarContenido(tipo, valor, fondo, valores, evento)
+            else:
+                pass
+        return i

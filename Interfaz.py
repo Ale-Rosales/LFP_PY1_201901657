@@ -1,8 +1,9 @@
-from lib2to3.pgen2 import token
 from tkinter import *
 from tkinter import messagebox as MessageBox
-
-from matplotlib.pyplot import text
+from Boton import Boton
+from Contenido import Contenido
+from Etiqueta import Etiqueta
+from Texto import Texto
 from Gestor import Gestor
 from Analizador import Analizador
 import easygui
@@ -14,10 +15,11 @@ analizar = Analizador()
 
 class Interfaz:
     def __init__(self):
-        self.tipo = []
-        self.fondo = []
-        self.valor = []
         self.evento = []
+        self.Texto = []
+        self.Etiqueta = []
+        self.Boton = []
+        self.Contenido = []
 
         raiz = Tk()
         raiz.title("Analizador, Proyecto1 LFP")
@@ -57,9 +59,9 @@ class Interfaz:
         botonErrores.place(x=280, y=10)
         manuales = Label(miFrame, text="Manuales", font=("Comic Sans MS", 15))
         manuales.place(x=470,y=20)
-        botonUsuario = Button(miFrame, text="Manual\nUsuario", font=("Comic Sans MS", 10),width=12, height=2)
+        botonUsuario = Button(miFrame, text="Manual\nUsuario", font=("Comic Sans MS", 10),width=12, height=2, command=self.Usuario)
         botonUsuario.place(x=580, y=10)
-        botonTecnico = Button(miFrame, text="Manual\nTecnico", font=("Comic Sans MS", 10),width=12, height=2)
+        botonTecnico = Button(miFrame, text="Manual\nTecnico", font=("Comic Sans MS", 10),width=12, height=2, command=self.Tecnico)
         botonTecnico.place(x=700, y=10)
 
         raiz.mainloop()
@@ -67,7 +69,6 @@ class Interfaz:
     #----------------------------FUNCIONES DE BOTONES (CARGAR Y ANALIZAR)----------------------------
 
     def Analizar(self):
-
         texto = self.analizar.get(1.0, "end-1c")  #->PARA PODER SACAR LA INFORMACION DEL CAMPO
         #texto = self.analizar.insert(1.0, "HOLAAAAAAAAAAA\n")  #->PARA PODER METER EL TEXTO EN EL CAMPO
         #analizar.analizar(texto)
@@ -77,8 +78,8 @@ class Interfaz:
             MessageBox.showwarning("Alerta", "No hay texto para analizar")
         else:
             analizar.analizar2(texto)
-            analizar.imprimirT()
-            analizar.imprimirE()
+            #analizar.imprimirT()
+            #analizar.imprimirE()
             self.Data()
             self.Formulario(texto)
 
@@ -87,16 +88,58 @@ class Interfaz:
 
     #----------------------------PRUEBAS PARA CREAR FORMULARIO----------------------------
 
-    def obtenerData(self,token):
-        if token.tipo == "Para HTML":
-            return token.lexema
+    def agregarContenido(self, tipo, valor, fondo, valores, evento):
+        self.Contenido.append(Contenido(tipo, valor, fondo, valores, evento))
+
+    def agregarContenidoBoton(self, tipo, valor, evento):
+        self.Boton.append(Boton(tipo, valor, evento))
+
+    def agregarContenidoTexto(self, tipo, valor, fondo):
+        self.Texto.append(Texto(tipo, valor, fondo))
+
+    def agregarContenidoEtiqueta(self, tipo, valor):
+        self.Etiqueta.append(Etiqueta(tipo, valor))
     
+    def print(self):
+        for x in self.Boton:
+            print("Tipo: "+x.tipo
+            +"\nValor: "+x.valor
+            +"\nEvento: "+x.evento)
+            print("\n")
+    
+    def print2(self):
+        for y in self.Etiqueta:
+            print("Tipo: "+y.tipo
+            +"\nValor: "+y.valor)
+            print("\n")
+
+    def print3(self):
+        for z in self.Texto:
+            print("Tipo: "+z.tipo
+            +"\nValor: "+z.valor
+            +"\nFondo: "+z.fondo)
+            print("\n")
+
+    def print4(self):
+        for r in self.Contenido:
+            print("Tipo: "+r.tipo
+            +"\nValor: "+r.valor)
+            print("\n")
+        
+    def print5(self):
+        for t in self.evento:
+            print(t)
+            print("\n")
+
     def Data(self):
-        self.DataEvento()
         #self.DataFondo()
-        self.DataTipo()
-        self.RadioSelect()
+        #self.DataTipo()
+        #self.RadioSelect()
         #self.DataValor()
+        self.ValorData()
+        #self.BotonData()
+        #self.EtiquetaData()
+        self.DataEvento()
  
     # Identificador_tipo(RADIO/SELECT) dosPuntos comillaDoble   HTML   Menos    HTML    comillaDoble ¿Coma?
     #       i                             i+1       i+2         i+3     i+4     i+5         i+6        i+7
@@ -111,8 +154,11 @@ class Interfaz:
     #       i               i+1         i+2         i+3         i+4     i+5 
 
     def Prueba(self):
-        for x in self.tipo:
-            print(x)
+        self.print()
+        #self.print2()
+        #self.print3()
+        self.print4()
+        #self.print5()
 
     def RadioSelect(self):
         tokens = analizar.Tokens
@@ -136,7 +182,6 @@ class Interfaz:
  
     def DataValor(self):
         tokens = analizar.Tokens
-        #print("\n")
         for i in range(0,len(tokens)):
             if tokens[i].tipo == "Identificador_valor":
                 texto = self.obtenerData(tokens[i+3])
@@ -145,7 +190,6 @@ class Interfaz:
 
     def DataFondo(self):
         tokens = analizar.Tokens
-        #print("\n")
         for i in range(0,len(tokens)):
             if tokens[i].tipo == "Identificador_fondo":
                 texto = self.obtenerData(tokens[i+3])
@@ -161,12 +205,290 @@ class Interfaz:
                     self.evento.append(texto)
 
     def ValorData(self):
-        """tokens = analizar.Tokens
-        for i in range(0,len(tokens)):
-            if tokens[i].tipo == "Menor que":
-                if tokens[i+2]"""
-        pass
-    
+        tokens = analizar.Tokens
+        i = 0
+        while tokens[i].tipo != "Corchete izquierdo":
+            i+=1
+        while tokens[i].tipo != "Corchete derecho":
+            i+=1
+            while tokens[i].tipo != "Menor que":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Identificador_tipo":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Dos puntos":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Comilla doble":
+                i+=1
+            i+=1
+            tipo = ""
+            valores = ""
+            evento = ""
+            fondo = ""
+            while tokens[i].tipo != "Comilla doble":
+                tipo = tipo + tokens[i].lexema
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Coma":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Identificador_valor":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Dos puntos":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Comilla doble":
+                i+=1
+            i+=1
+            valor = ""
+            while tokens[i].tipo != "Comilla doble":
+                valor = valor + tokens[i].lexema
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Mayor que":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Coma":
+                if tokens[i].tipo == "Corchete derecho":
+                    self.agregarContenido(tipo, valor, fondo, valores, evento)
+                    break
+                else:
+                    i+=1
+            if tokens[i].tipo == "Coma":
+                self.agregarContenido(tipo, valor, fondo, valores, evento)
+            else:
+                pass
+        return i
+
+    def BotonData(self):
+        tokens = analizar.Tokens
+        i = 0
+        while tokens[i].tipo != "Corchete izquierdo":
+            i+=1
+        while tokens[i].tipo != "Corchete derecho":
+            i+=1
+            while tokens[i].tipo != "Menor que":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Identificador_tipo":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Dos puntos":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Comilla doble":
+                i+=1
+            i+=1
+            tipo = ""
+            while tokens[i].tipo != "Comilla doble":
+                tipo = tipo + tokens[i].lexema
+                i+=1
+            i+=1
+            if tipo == "boton":
+                while tokens[i].tipo != "Coma":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Identificador_valor":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Dos puntos":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Comilla doble":
+                    i+=1
+                i+=1
+                valor = ""
+                while tokens[i].tipo != "Comilla doble":
+                    valor = valor + tokens[i].lexema
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Coma":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Identificador_evento":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Dos puntos":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Comilla doble":
+                    i+=1
+                i+=1
+                evento = ""
+                while tokens[i].tipo != "Comilla doble":
+                    evento = evento + tokens[i].lexema
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Mayor que":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Coma":
+                    if tokens[i].tipo == "Corchete derecho":
+                        self.agregarContenidoBoton(tipo, valor, evento)
+                        break
+                    else:
+                        i+=1
+                if tokens[i].tipo == "Coma":
+                    self.agregarContenidoBoton(tipo, valor, evento)
+                else:
+                    pass
+        return i
+
+
+    def EtiquetaData(self):
+        tokens = analizar.Tokens
+        i = 0
+        while tokens[i].tipo != "Corchete izquierdo":
+            i+=1
+        while tokens[i].tipo != "Corchete derecho":
+            i+=1
+            while tokens[i].tipo != "Menor que":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Identificador_tipo":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Dos puntos":
+                i+=1
+            i+=1
+            while tokens[i].tipo != "Comilla doble":
+                i+=1
+            i+=1
+            tipo = ""
+            while tokens[i].tipo != "Comilla doble":
+                tipo = tipo + tokens[i].lexema
+                i+=1
+            i+=1
+            if tipo == "etiqueta":
+                while tokens[i].tipo != "Coma":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Identificador_valor":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Dos puntos":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Comilla doble":
+                    i+=1
+                i+=1
+                valor = ""
+                while tokens[i].tipo != "Comilla doble":
+                    valor = valor + tokens[i].lexema
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Mayor que":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Coma":
+                    if tokens[i].tipo == "Corchete derecho":
+                        self.agregarContenidoEtiqueta(tipo, valor)
+                        break
+                    else:
+                        i+=1
+                if tokens[i].tipo == "Coma":
+                    self.agregarContenidoEtiqueta(tipo, valor)
+                else:
+                    pass
+                #return i
+            elif tipo == "boton":
+                while tokens[i].tipo != "Identificador_valor":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Dos puntos":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Comilla doble":
+                    i+=1
+                i+=1
+                valor1 = ""
+                while tokens[i].tipo != "Comilla doble":
+                    valor1 = valor1 + tokens[i].lexema
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Coma":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Identificador_evento":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Dos puntos":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Comilla doble":
+                    i+=1
+                i+=1
+                evento = ""
+                while tokens[i].tipo != "Comilla doble":
+                    evento = evento + tokens[i].lexema
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Mayor que":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Coma":
+                    if tokens[i].tipo == "Corchete derecho":
+                        self.agregarContenidoBoton(tipo, valor1, evento)
+                        break
+                    else:
+                        i+=1
+                if tokens[i].tipo == "Coma":
+                    self.agregarContenidoBoton(tipo, valor1, evento)
+                else:
+                    pass
+                #return i
+            elif tipo == "texto":
+                while tokens[i].tipo != "Identificador_valor":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Dos puntos":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Comilla doble":
+                    i+=1
+                i+=1
+                valor2 = ""
+                while tokens[i].tipo != "Comilla doble":
+                    valor2 = valor2 + tokens[i].lexema
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Coma":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Identificador_evento":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Dos puntos":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Comilla doble":
+                    i+=1
+                i+=1
+                fondo = ""
+                while tokens[i].tipo != "Comilla doble":
+                    fondo = fondo + tokens[i].lexema
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Mayor que":
+                    i+=1
+                i+=1
+                while tokens[i].tipo != "Coma":
+                    if tokens[i].tipo == "Corchete derecho":
+                        self.agregarContenidoTexto(tipo, valor2, fondo)
+                        break
+                    else:
+                        i+=1
+                if tokens[i].tipo == "Coma":
+                    self.agregarContenidoTexto(tipo, valor2, fondo)
+                else:
+                    pass
+        return i
+
+            
+
     #----------------------------FORMULARIO----------------------------
 
     def Formulario(self,texto):
@@ -202,41 +524,52 @@ class Interfaz:
 
         #-------------------------------LABEL-------------------------------
 
-        for label in self.tipo:
-            if label == "etiqueta":
-                file.write('<label for="inputF">'+str("Nombre:")+'</label><br>')
+        for label in self.Contenido:
+            if label.tipo == "etiqueta":
+                file.write('<br>')
+                file.write('<label>'+str(label.valor)+'</label><br>')
+                file.write('<br>')
             
         #-------------------------------INPUT-------------------------------
 
-        for input in self.tipo:
-            if input == "texto":
-                file.write('<input type="text" id="inputF" placeholder="Ingrese Nombre"></input>')
+        for input in self.Contenido:
+            if input.tipo == "texto":
+                file.write('<br>')
+                file.write('<input type="text" id="inputF" placeholder="PlaceHolder"></input>')
+                file.write('<br>')
         file.write('<br>')
         file.write('<br>')
 
         #-------------------------------RADIO BUTTONS-------------------------------
         
-        file.write('<label>'+str("Sexo:")+'</label><br>')
-        for radio in self.tipo:
-            if radio == "grupo-radio":
-                file.write('<input id="masculino" type="radio" name="genero" value="Masculino">')
-                file.write('<label for="masculino">'+str("Masculino")+'</label><br>')
-                file.write('<input id="femenino" type="radio" name="genero" value="Femenino">')
-                file.write('<label for="femenino">'+str("Femenino")+'</label><br>')
+        for radio in self.Contenido:
+            if radio.tipo == "grupo-radio":
+                file.write('<br>')
+                file.write('<label>'+str(radio.valor)+'</label><br>')
+                file.write('<input id="op1" type="radio" name="opciones" value="Opcion1">')
+                file.write('<label for="op1">'+str("Opcion1")+'</label><br>')
+                file.write('<input id="op2" type="radio" name="opciones" value="Opcion2">')
+                file.write('<label for="op2">'+str("Opcion2")+'</label><br>')
+                file.write('<input id="op3" type="radio" name="opciones" value="Opcion3">')
+                file.write('<label for="op3">'+str("Opcion3")+'</label><br>')
+                file.write('<br>')
 
         file.write('<br>')
         file.write('<br>')
 
         #-------------------------------SELECT-------------------------------
         
-        file.write('<label>'+str("Pais:")+'</label><br>')
-        for select in self.tipo:
-            if select == "grupo-option":
-                file.write('<select name="Paises" id="paises">')
-                file.write('<option value="Guatemala">'+str("Guatemala")+'</option>')
-                file.write('<option value="El Salvador">'+str("El Salvador")+'</option>')
-                file.write('<option value="Honduras">'+str("Honduras")+'</option>')
+        for select in self.Contenido:
+            if select.tipo == "grupo-option":
+                file.write('<br>')
+                file.write('<label>'+str(select.valor)+'</label><br>')
+                file.write('<select name="select" id="seleccion">')
+                file.write('<option value="" selected="selected" hidde="hidden">'+str("Escoger opcion")+'</option>')
+                file.write('<option value="Select1">'+str("Select1")+'</option>')
+                file.write('<option value="Select2">'+str("Select2")+'</option>')
+                file.write('<option value="Select3">'+str("Select3")+'</option>')
                 file.write('</select>')
+                file.write('<br>')
 
         file.write('<br>')
         file.write('<br>')
@@ -244,13 +577,17 @@ class Interfaz:
 
         #-------------------------------BOTON-------------------------------
         # -> info | -> entrada
-        for boton in self.tipo:
-            for evento in self.evento:
-                if boton == "boton":
-                    if evento == "info":
-                        file.write('<button onclick="TomarDatos()">'+str("Valor")+'</button>')
-                    elif evento == "entrada":
-                        file.write('<button onclick="Entrada()">'+str("Valor")+'</button>')
+        for boton in self.Contenido:
+            for x in self.evento:
+                if boton.tipo == "boton":
+                    if x == "info":
+                        file.write('<br>')
+                        file.write('<button onclick="TomarDatos()">'+str(boton.valor)+'</button>')
+                        file.write('<br>')
+                    else:
+                        file.write('<br>')
+                        file.write('<button onclick="Entrada()">'+str(boton.valor)+'</button>')
+                        file.write('<br>')
         file.write('<br>')
         file.write('<br>')
 
@@ -388,7 +725,7 @@ class Interfaz:
     def ReporteErrores(self):
         errores = analizar.Errores
         if len(errores) == 0:
-            MessageBox.showwarning("Alerta", "Sin contenido para reportes")
+            MessageBox.showwarning("Alerta", "Sin contenido para reporte")
         else:
             textoTabla = ""
             txtFinal = ('</div>'
@@ -453,8 +790,8 @@ class Interfaz:
             webbrowser.open("file:///"+os.getcwd()+"/REPORTES/ReporteErrores.html")
 
     #----------------------------DOCUMENTACION----------------------------
-    #def Usuario(self):
-        #webbrowser.open("file:///"+os.getcwd()+"/DOCUMENTACION/ManualUsuario.pdf")
+    def Usuario(self):
+        webbrowser.open("file:///"+os.getcwd()+"/DOCUMENTACION/ManualUsuario.pdf")
 
-    #def Tecnico(self):
-        #webbrowser.open("file:///"+os.getcwd()+"/DOCUMENTACION/ManualTecnico.pdf")
+    def Tecnico(self):
+        webbrowser.open("file:///"+os.getcwd()+"/DOCUMENTACION/ManualTecnico.pdf")

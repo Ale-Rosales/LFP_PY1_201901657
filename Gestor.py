@@ -1,10 +1,12 @@
 from http.client import ImproperConnectionState
+from importlib import import_module
 import easygui
 from Analizador import Analizador
+from Contenido import Contenido
 
 class Gestor:
 
-    def __init__(self) -> None:
+    def __init__(self):
         pass
 
     def rutaArchivo(self):
