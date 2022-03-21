@@ -6,8 +6,6 @@ from pyparsing import col, line
 from soupsieve import select
 from Token import Token
 from Error import Error
-from Tokens import Tokens
-from Errores import Errores
 from prettytable import PrettyTable
 
 class Analizador:
@@ -20,8 +18,6 @@ class Analizador:
         self.buffer = ''
         self.estado = 0
         self.i = 0
-        self.listaTokens=[]
-        self.listaErrores=[]
     
     def agregarToken(self,caracter, linea, columna, token):
         self.Tokens.append(Token(caracter,linea,columna,token))
@@ -30,233 +26,6 @@ class Analizador:
     def agregarError(self,caracter, linea, columna):
         self.Errores.append(Error('Caracter ' + caracter + ' no reconocido.', linea, columna))
 
-    
-    #----------------------------PRUEBA DE ANALIZAR (NO LEE BIEN)----------------------------
-    
-    def isLetter(self,caracter):
-        if(ord(caracter) >= 65 and ord(caracter) <= 90
-        or (ord(caracter)) >= 97 and ord(caracter) <= 122
-        or ord(caracter) == 164 or ord(caracter) == 165):
-            return True
-        else:
-            return False
-        
-    def isNum(self,caracter):
-        if ((ord(caracter) >= 48 and ord(caracter) <= 57)):
-            return True
-        else:
-            return False
-
-    def isCharacter(self,caracter):
-        if ((ord(caracter) >= 32 and ord(caracter) != 34)):
-            return True
-        elif (160 <= ord(caracter) <= 165 or ord(caracter) == 129 or ord(caracter == 130)):
-            return True
-        elif ord(caracter) == 34:
-            return False
-
-    def analizar(self, texto):
-        self.listaTokens=[]
-        self.listaErrores=[]
-        estado = 0
-        fila = 1
-        columna = 1
-        lexema = ''
-        i = 0
-        while i < len(texto):
-            x = texto[i]
-            if estado == 0:
-                if x == '~':
-                    self.listaTokens.append(Tokens("~", "Signo raro", fila, columna))
-                    columna+=1
-                elif x == '>':
-                    self.listaTokens.append(Tokens(">","Mayor que",fila,columna))
-                    columna+=1
-                elif x == '[':
-                    self.listaTokens.append(Tokens("[","Corchete Izquierda",fila,columna))
-                    columna+=1
-                elif x == ']':
-                    self.listaTokens.append(Tokens("]","Corchete derecho",fila,columna))
-                    columna+=1
-                elif x == '<':
-                    self.listaTokens.append(Tokens("<","Menor que",fila,columna))
-                    columna+=1
-                elif x == ':':
-                    self.listaTokens.append(Tokens(":","Dos puntos",fila,columna))
-                    columna+=1
-                elif x == ',':
-                    self.listaTokens.append(Tokens(",","Coma",fila,columna))
-                    columna+=1
-                elif x == '"':
-                    self.listaTokens.append(Tokens('"',"Comilla Doble",fila,columna))
-                    columna+=1
-                elif x == "'":
-                    self.listaTokens.append(Tokens("'","Comilla Simple",fila,columna))
-                    columna+=1
-                elif x == '\n':
-                    fila+=1
-                    columna+=1
-                elif self.isNum(x) == True:
-                    lexema+=x
-                    columna+=1
-                    estado = 9
-                elif self.isLetter(x) == True:
-                    lexema+=x
-                    columna+=1
-                    estado = 11
-                elif x == '$':
-                    self.listaTokens.append(Tokens('$',"Fin Cadena",fila,columna))
-                    print("Fin del analisis")
-                else:
-                    e = "Error lexico en fila "+str(fila)+" y columna "+str(columna)
-                    self.listaErrores.append(Errores(fila,columna,e, "Simbolo, letra o digito"))
- 
-            elif estado == 1:
-                if x == '\n':
-                    fila += 1
-                    columna = 1
-                    estado = 0
-                else:
-                    pass
-            elif estado == 2:
-                if x == "'":
-                    columna+=1
-                    estado = 3
-                elif ord(x) == 32 or ord(x) == 10 or ord(x) == 9:
-                    pass
-                elif x == '\n':
-                    fila+=1
-                    columna=1
-            elif estado == 3:
-                if x == "'":
-                    self.listaTokens.append(Tokens("'''", 'Comilla Simple',fila,columna))
-                    columna+=1
-                    estado=4
-                elif ord(x) == 32 or ord(x) == 10 or ord(x) == 9:
-                    pass
-                elif x == '\n':
-                    fila+=1
-                    columna=1
-                else:
-                    e = "Error lexico en fila "+str(fila)+" y columna "+str(columna)
-                    self.listaErrores.append(Errores(fila,columna,e, "Simbolo, letra o digito"))
-            elif estado == 4:
-                if x == "'":
-                    columna += 1
-                    estado = 5
-                elif x == '\n':
-                    fila+=1
-                    columna=1
-                else:
-                    pass
-            elif estado == 5:
-                if x == "'":
-                    columna+=1
-                    estado = 6
-                elif ord(x) == 32 or ord(x) == 10 or ord(x) == 9:
-                    pass
-                elif x=='\n':
-                    fila+=1
-                    columna=1
-            elif estado == 6:
-                if x == "'":
-                    self.listaTokens.append(Token("'''", 'ComillaSimple',fila,columna))
-                    columna+=1
-                    estado=0
-                elif ord(x) == 32 or ord(x) == 10 or ord(x) == 9:
-                    pass
-                elif x=='\n':
-                    fila+=1
-                    columna=1
-            elif estado == 7:
-                if self.isCharacter(x)==True:
-                    lexema+=x
-                    columna+=1
-                    estado = 8
-                elif x=='"':
-                    lexema=''
-                    columna+=1
-                    i-=1
-                    estado=8
-                else:
-                    e='Error lexico en fila '+str(fila)+' y columna '+str(columna)+" revisar"
-                    self.listaErrores.append(Errores(fila, columna, e, "caracter o cadena vacía"))
-            elif estado==8:
-                if self.isCharacter(x)==True:
-                    lexema+=x
-                    columna+=1
-                elif x=='"':
-                    self.listaTokens.append(Token('cadena',lexema,fila,columna))
-                    lexema=''
-                    self.listaTokens.append(Token('"', 'ComillaDoble',fila,columna))
-                    columna+=1
-                    estado=0
-                else:
-                    e='Error lexico en fila '+str(fila)+' y columna '+str(columna)+" revisar"
-                    self.listaErrores.append(Errores(fila, columna, e, 'caracter o " '))
-            elif estado==9:
-                if self.isNum(x)==True:
-                    lexema+=x
-                    columna+=1
-                elif x == '.':
-                    lexema+=x
-                    estado=10
-                    columna+=1
-                else: 
-                    self.listaTokens.append(Token('entero',lexema ,fila,columna))
-                    lexema=''
-                    i-=1
-                    estado=0
-            elif estado==10:
-                if self.isNum(x)==True:
-                    lexema+=x
-                    columna+=1
-                else:
-                    self.listaTokens.append(Token('real',lexema,fila, columna))
-                    lexema=''
-                    estado=0
-                    i-=1
-            elif estado == 11:
-                if self.isLetter(x)==True:
-                    lexema+=x
-                else:
-                    if lexema == 'formulario':
-                        self.listaTokens.append(Tokens(lexema,'palabra reservada',fila,columna))
-                    if lexema == 'tipo':
-                        self.listaTokens.append(Tokens(lexema,'tipo',fila,columna))
-                    elif lexema == 'valor':
-                        self.listaTokens.append(Tokens(lexema,'valor',fila,columna))
-                    elif lexema == 'fondo':
-                        self.listaTokens.append(Tokens(lexema,'fondo',fila,columna))
-                    elif lexema == 'valores':
-                        self.listaTokens.append(Tokens(lexema,'valores',fila,columna))
-                    elif lexema == 'evento':
-                        self.listaTokens.append(Tokens(lexema,'evento',fila,columna))
-                    else:
-                        e='Error lexico en fila '+str(fila)+' y columna '+str(columna)+" revisar comando"
-                        self.listaErrores.append(Errores(fila, columna, e, "Comando"))
-                    lexema=''
-                    i-=1
-                    estado=0
-            i+=1
-        return self.listaTokens
-                
-    def imprimirTokens(self):
-        '''Imprime una tabla con los tokens'''
-        x = PrettyTable()
-        x.field_names = ["Token","Lexema","Fila","Columna"]
-        for token in self.listaTokens:
-            x.add_row([token.token, token.lexema, token.fila,token.columna])
-        print(x)
-
-    def imprimirErrores(self):
-        '''Imprime una tabla con los errores'''
-        x = PrettyTable()
-        x.field_names = ["Fila","Columna","Descripcion"]
-        for error_ in self.listaErrores:
-            x.add_row([error_.fila, error_.columna, error_.descripcion])
-        print(x)
-    
     #---------------------OTRA PRUEBA DE ANALIZAR (ESTA PARECE LEER BIEN)---------------------
     def S0(self, caracter : str):
         "Estado Q0"
@@ -264,48 +33,48 @@ class Analizador:
             self.estado = 1
             self.buffer += caracter
             self.columna += 1
-        elif caracter.isdigit():
+        #elif caracter.isdigit():
+            #self.estado = 2
+            #self.buffer += caracter
+            #self.columna += 1
+        elif caracter == '~':
             self.estado = 2
             self.buffer += caracter
             self.columna += 1
-        elif caracter == '~':
+        elif caracter == '>':
             self.estado = 3
             self.buffer += caracter
             self.columna += 1
-        elif caracter == '>':
+        elif caracter == '[':
             self.estado = 4
             self.buffer += caracter
             self.columna += 1
-        elif caracter == '[':
+        elif caracter == '<':
             self.estado = 5
             self.buffer += caracter
             self.columna += 1
-        elif caracter == '<':
+        elif caracter == ':':
             self.estado = 6
             self.buffer += caracter
             self.columna += 1
-        elif caracter == ':':
+        elif caracter == '"':
             self.estado = 7
             self.buffer += caracter
             self.columna += 1
-        elif caracter == '"':
+        elif caracter == ',':
             self.estado = 8
             self.buffer += caracter
             self.columna += 1
-        elif caracter == ',':
+        elif caracter == "'":
             self.estado = 9
             self.buffer += caracter
             self.columna += 1
-        elif caracter == "'":
+        elif caracter ==']':
             self.estado = 10
             self.buffer += caracter
             self.columna += 1
-        elif caracter ==']':
-            self.estado = 11
-            self.buffer += caracter
-            self.columna += 1
         elif caracter == '-':
-            self.estado = 12
+            self.estado = 11
             self.buffer += caracter
             self.columna += 1
         elif caracter == '\n':
@@ -341,7 +110,7 @@ class Analizador:
                 self.estado = 0
                 self.i -= 1
 
-    def S2(self, caracter : str):
+    """def S2(self, caracter : str):
         if caracter.isdigit():
             self.estado = 2
             self.buffer += caracter
@@ -349,59 +118,59 @@ class Analizador:
         else:
             self.agregarToken(self.buffer, self.linea, self.columna, 'Numero')
             self.estado = 0
-            self.i -= 1
+            self.i -= 1"""
 
-    def S3(self, caracter : str):
+    def S2(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Signo raro')
         self.estado = 0
         self.i -= 1
 
-    def S4(self, caracter : str):
+    def S3(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Mayor que')
         self.estado = 0
         self.i -= 1
 
-    def S5(self, caracter : str):
+    def S4(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Corchete izquierdo')
         self.estado = 0
         self.i -= 1
 
-    def S6(self, caracter : str):
+    def S5(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Menor que')
         self.estado = 0
         self.i -= 1
 
-    def S7(self, caracter : str):
+    def S6(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Dos puntos')
         self.estado = 0
         self.i -= 1
 
-    def S8(self, caracter : str):
+    def S7(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Comilla doble')
         self.estado = 0
         self.i -= 1
 
-    def S9(self, caracter : str):
+    def S8(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Coma')
         self.estado = 0
         self.i -= 1
 
-    def S10(self, caracter : str):
+    def S9(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Comilla simple')
         self.estado = 0
         self.i -= 1
 
-    def S11(self, caracter : str):
+    def S10(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Corchete derecho')
         self.estado = 0
         self.i -= 1
     
-    def S12(self, caracter : str):
+    def S11(self, caracter : str):
         self.agregarToken(self.buffer, self.linea, self.columna, 'Signo menos')
         self.estado = 0
         self.i -= 1
 
-    def analizar2(self,cadena):
+    def analizar(self,cadena):
         self.Errores = []
         self.Tokens = []
         self.i = 0
@@ -430,8 +199,6 @@ class Analizador:
                 self.S10(cadena[self.i])
             elif self.estado == 11:
                 self.S11(cadena[self.i])
-            elif self.estado == 12:
-                self.S12(cadena[self.i])
             self.i += 1
             
     def imprimirT(self):

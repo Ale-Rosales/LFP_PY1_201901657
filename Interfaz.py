@@ -77,7 +77,7 @@ class Interfaz:
         if len(texto) == 0:
             MessageBox.showwarning("Alerta", "No hay texto para analizar")
         else:
-            analizar.analizar2(texto)
+            analizar.analizar(texto)
             #analizar.imprimirT()
             #analizar.imprimirE()
             self.Data()
